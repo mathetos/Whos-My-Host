@@ -70,7 +70,7 @@ class WhosMyHost {
             <table class="form-table">
                 <tbody>
                 <tr>
-                    <th scope="row">HOST_DB</th>
+                    <th scope="row">DB_HOST</th>
                     <td><?php
 						$DBHOST = ( ! empty( 'DB_HOST' ) ? 'DB_HOST' : '<code>DB_HOST</code> is not defined.' );
 						echo wp_kses( $DBHOST, $args );
@@ -159,6 +159,11 @@ class WhosMyHost {
             </table>
 
             <div style="max-width: 750px; border: 1px solid #333; padding: 20px; background: #e9e9e9; margin: 20px 0; font-size: 150%; line-height: 1.5rem;">
+                <h3>Best guess for your web host:</h3>
+                <p><?php echo $this->find_host(); ?></p>
+            </div>
+
+            <div style="max-width: 750px; border: 1px solid #333; padding: 20px; background: #e9e9e9; margin: 20px 0; font-size: 150%; line-height: 1.5rem;">
                 <h3>INSTRUCTIONS:</h3>
                 <ol>
                     <li>Please take a screenshot of this page with your screenshot tool of choice. Just save the image
@@ -178,13 +183,45 @@ class WhosMyHost {
         </div>
 	<?php }
 
+	public function get_server() {
+
+	    $is_local = false;
+		$getserver  = $_SERVER['SERVER_NAME'];
+		$find_local = strpos($getserver, 'local');
+
+		if ( !empty($find_local) ) {
+		    $is_local = true;
+        }
+
+        return $is_local;
+    }
+
+    public function find_host() {
+	    $find_host = gethostname();
+
+	    if ( $this->get_server() == true ) {
+		    $the_host = "This is a local environment";
+		    return $the_host;
+		    exit;
+	    }
+
+	    $the_host = "We cannot determine your web host. Please mention it in your support ticket.";
+
+        if ( strpos( $find_host, 'sgvps.net') ) {
+            $the_host = "Siteground";
+        } elseif ( strpos( $find_host, 'secureserver.net') ) {
+	        $the_host = "GoDaddy/Media Temple";
+        } elseif ( strpos( $find_host, 'pagelyhosting.com' ) ) {
+            $the_host = "Pagely";
+        } elseif ( strpos( $find_host, preg_match('/wp[0-9]/', $find_host) ) ) {
+	        $the_host = "Bluehost";
+        }
+
+        return $the_host;
+
+    }
+
 }
 if ( is_admin() )
 	$whos_my_host = new WhosMyHost();
 
-/*
- * Retrieve this value with:
- * $whos_my_host_options = get_option( 'whos_my_host_option_name' ); // Array of All Options
- * $server_0 = $whos_my_host_options['server_0']; // SERVER
- * $host_db_1 = $whos_my_host_options['host_db_1']; // HOST_DB
- */
