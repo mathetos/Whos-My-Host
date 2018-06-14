@@ -183,7 +183,7 @@ class WhosMyHost {
         </div>
 	<?php }
 
-	public function get_server() {
+	public function is_local() {
 
 	    $is_local = false;
 		$getserver  = $_SERVER['SERVER_NAME'];
@@ -199,7 +199,7 @@ class WhosMyHost {
     public function find_host() {
 	    $find_host = gethostname();
 
-	    if ( $this->get_server() == true ) {
+	    if ( $this->is_local() == true ) {
 		    $the_host = "This is a local environment";
 		    return $the_host;
 		    exit;
@@ -209,11 +209,13 @@ class WhosMyHost {
 
         if ( strpos( $find_host, 'sgvps.net') ) {
             $the_host = "Siteground";
+        } elseif ( strpos( $find_host, 'fw') ) {
+	        $the_host = "Flywheel";
         } elseif ( strpos( $find_host, 'secureserver.net') ) {
 	        $the_host = "GoDaddy/Media Temple";
         } elseif ( strpos( $find_host, 'pagelyhosting.com' ) ) {
             $the_host = "Pagely";
-        } elseif ( strpos( $find_host, preg_match('/wp[0-9]/', $find_host) ) ) {
+        } elseif ( strpos( $find_host, preg_match('wp', $find_host) ) ) {
 	        $the_host = "Bluehost";
         }
 
